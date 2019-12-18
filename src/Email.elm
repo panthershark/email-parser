@@ -1,11 +1,8 @@
-module Email exposing
-    ( EmailAddress, toString
-    , isValid, parse
-    )
+module Email exposing (EmailAddress, isValid, parse, toString)
 
 {-| Email parser and validation library.
 
-@docs EmailAddress, isValidEmail, parseEmailAddress, toString
+@docs EmailAddress, isValid, parse, toString
 
 -}
 
