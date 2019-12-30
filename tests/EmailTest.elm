@@ -23,6 +23,10 @@ suite =
                 \_ ->
                     isValid "hello@world.com"
                         |> Expect.equal True
+            , test "valid email, multiple dots in domain parts" <|
+                \_ ->
+                    isValid "user@one.two.three"
+                        |> Expect.equal True
             , test "invalid char in local part" <|
                 \_ ->
                     isValid "he^llo@world.com"
