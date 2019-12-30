@@ -21,7 +21,7 @@ import Email exposing (parse)
 parse "hello@world.com" == Ok { local = "hello", domain = "world.com" } 
 ```
 
-### Email Parsing
+### toString
 
 ```
 import Email exposing (toString)
