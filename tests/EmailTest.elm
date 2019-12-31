@@ -18,62 +18,7 @@ suite =
                     parse "helloworld.com"
                         |> Expect.err
             ]
-        , describe "isValid"
-            [ test "valid email" <|
-                \_ ->
-                    isValid "hello@world.com"
-                        |> Expect.equal True
-            , test "valid email - dot in local part" <|
-                \_ ->
-                    isValid "hello.world@world.com"
-                        |> Expect.equal True
-            , test "valid email - multiple dots in local part" <|
-                \_ ->
-                    isValid "h.e.l.l.o@world.com"
-                        |> Expect.equal True
-            , test "valid email, multiple dots in domain parts" <|
-                \_ ->
-                    isValid "user@one.two.three"
-                        |> Expect.equal True
-            , test "invalid char in local part" <|
-                \_ ->
-                    isValid "he^llo@world.com"
-                        |> Expect.equal False
-            , test "invalid char in domain part" <|
-                \_ ->
-                    isValid "hello@worl^d.com"
-                        |> Expect.equal False
-            , test "bad domain" <|
-                \_ ->
-                    isValid "hello@world"
-                        |> Expect.equal False
-            , test "missing domain" <|
-                \_ ->
-                    isValid "hello@"
-                        |> Expect.equal False
-            , test "missing local" <|
-                \_ ->
-                    isValid "@world.com"
-                        |> Expect.equal False
-            ]
-        , describe "obscure email variations (these are valid if quoted, but RFC 5321 warns against it and this is accepted as a bad idea)"
-            [ test "local part is whitespace - not quoted" <|
-                \_ ->
-                    isValid " @example.org"
-                        |> Expect.equal False
-            , test "local part has 2 consecutive dots" <|
-                \_ ->
-                    isValid "john..doe@example.org"
-                        |> Expect.equal False
-            , test "local part starts with dot" <|
-                \_ ->
-                    isValid ".john@example.org"
-                        |> Expect.equal False
-            , test "local part ends with dot" <|
-                \_ ->
-                    isValid "john.@example.org"
-                        |> Expect.equal False
-            ]
+        , describe "isValid" <| validEmailTests ++ invalidEmailTests
         , describe "toString"
             [ test "happy path" <|
                 \_ ->
@@ -81,3 +26,82 @@ suite =
                         |> Expect.equal "hello@world.com"
             ]
         ]
+
+
+
+-- Data
+
+
+type alias EmailTest =
+    { description : String
+    , email : String
+    }
+
+
+validEmails : List EmailTest
+validEmails =
+    [ { description = "valid email"
+      , email = "hello@world.com"
+      }
+    , { description = "valid email - dot in local part"
+      , email = "hello.world@world.com"
+      }
+    , { description = "valid email - multiple dots in local part"
+      , email = "h.e.l.l.o@world.com"
+      }
+    , { description = "valid email, multiple dots in domain parts"
+      , email = "user@one.two.three"
+      }
+    ]
+
+
+invalidEmails : List EmailTest
+invalidEmails =
+    [ { description = "invalid char in local part"
+      , email = "he^llo@world.com"
+      }
+    , { description = "invalid char in domain part"
+      , email = "hello@worl^d.com"
+      }
+    , { description = "bad domain"
+      , email = "hello@world"
+      }
+    , { description = "missing domain"
+      , email = "hello@"
+      }
+    , { description = "missing local"
+      , email = "@world.com"
+      }
+    , { description = "local part is whitespace - not quoted"
+      , email = " @example.org"
+      }
+    , { description = "local part has 2 consecutive dots"
+      , email = "john..doe@example.org"
+      }
+    , { description = "local part starts with dot"
+      , email = ".john@example.org"
+      }
+    , { description = "local part ends with dot"
+      , email = "john.@example.org"
+      }
+    ]
+
+
+
+-- Helpers
+
+
+toIsValidTest : Bool -> EmailTest -> Test
+toIsValidTest expect { description, email } =
+    test description <|
+        \_ -> isValid email |> Expect.equal expect
+
+
+validEmailTests : List Test
+validEmailTests =
+    List.map (toIsValidTest True) validEmails
+
+
+invalidEmailTests : List Test
+invalidEmailTests =
+    List.map (toIsValidTest False) invalidEmails
