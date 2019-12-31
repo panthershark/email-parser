@@ -96,6 +96,18 @@ invalidEmails =
     , { description = "local part ends with dot"
       , email = "john.@example.org"
       }
+    , { description = "no @ sign"
+      , email = "example.com"
+      }
+    , { description = "two @ signs"
+      , email = "email@domain@domain.com"
+      }
+    , { description = "unquoted leading spaces"
+      , email = "my-name email@domain.com"
+      }
+    , { description = "unquoted trailing spaces"
+      , email = "email@domain.com my-name"
+      }
     ]
 
 
