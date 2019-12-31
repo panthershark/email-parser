@@ -52,6 +52,18 @@ validEmails =
     , { description = "valid email, multiple dots in domain parts"
       , email = "user@one.two.three"
       }
+    , { description = "+ sign in local part"
+      , email = "firstname+lastname@domain.com"
+      }
+    , { description = "dash sign in local part"
+      , email = "firstname-lastname@domain.com"
+      }
+    , { description = "dash in domain part"
+      , email = "email@domain-one.com"
+      }
+    , { description = "multiple dots in domain part"
+      , email = "firstname@example.co.uk"
+      }
     ]
 
 
