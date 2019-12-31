@@ -18,7 +18,8 @@ suite =
                     parse "helloworld.com"
                         |> Expect.err
             ]
-        , describe "isValid" <| validEmailTests ++ invalidEmailTests
+        , describe "valid emails" <| validEmailTests
+        , describe "invalid emails" <| invalidEmailTests
         , describe "toString"
             [ test "happy path" <|
                 \_ ->
@@ -32,45 +33,51 @@ suite =
 -- Data
 
 
-type alias EmailTest =
+type alias ValidEmailTest =
+    { description : String
+    , email : EmailAddress
+    }
+
+
+validEmails : List ValidEmailTest
+validEmails =
+    [ { description = "valid email"
+      , email = { local = "hello", domain = "world.com" }
+      }
+    , { description = "valid email - dot in local part"
+      , email = { local = "hello.world", domain = "world.com" }
+      }
+    , { description = "valid email - multiple dots in local part"
+      , email = { local = "h.e.l.l.o", domain = "world.com" }
+      }
+    , { description = "valid email, multiple dots in domain parts"
+      , email = { local = "user", domain = "one.two.three" }
+      }
+    , { description = "+ sign in local part"
+      , email = { local = "firstname+lastname", domain = "domain.com" }
+      }
+    , { description = "dash sign in local part"
+      , email = { local = "firstname-lastname", domain = "domain.com" }
+      }
+    , { description = "dash in domain part"
+      , email = { local = "email", domain = "domain-one.com" }
+      }
+    , { description = "multiple dots in domain part"
+      , email = { local = "firstname", domain = "example.co.uk" }
+      }
+    , { description = "ipv4 address for domain"
+      , email = { local = "email", domain = "123.123.123.123" }
+      }
+    ]
+
+
+type alias InvalidEmailTest =
     { description : String
     , email : String
     }
 
 
-validEmails : List EmailTest
-validEmails =
-    [ { description = "valid email"
-      , email = "hello@world.com"
-      }
-    , { description = "valid email - dot in local part"
-      , email = "hello.world@world.com"
-      }
-    , { description = "valid email - multiple dots in local part"
-      , email = "h.e.l.l.o@world.com"
-      }
-    , { description = "valid email, multiple dots in domain parts"
-      , email = "user@one.two.three"
-      }
-    , { description = "+ sign in local part"
-      , email = "firstname+lastname@domain.com"
-      }
-    , { description = "dash sign in local part"
-      , email = "firstname-lastname@domain.com"
-      }
-    , { description = "dash in domain part"
-      , email = "email@domain-one.com"
-      }
-    , { description = "multiple dots in domain part"
-      , email = "firstname@example.co.uk"
-      }
-    , { description = "ipv4 address for domain"
-      , email = "email@123.123.123.123"
-      }
-    ]
-
-
-invalidEmails : List EmailTest
+invalidEmails : List InvalidEmailTest
 invalidEmails =
     [ { description = "invalid char in local part"
       , email = "he^llo@world.com"
@@ -118,17 +125,23 @@ invalidEmails =
 -- Helpers
 
 
-toIsValidTest : Bool -> EmailTest -> Test
-toIsValidTest expect { description, email } =
+toValidTest : ValidEmailTest -> Test
+toValidTest { description, email } =
     test description <|
-        \_ -> isValid email |> Expect.equal expect
+        \_ -> parse (email.local ++ "@" ++ email.domain) |> Expect.equal (Ok email)
+
+
+toInvalidTest : InvalidEmailTest -> Test
+toInvalidTest { description, email } =
+    test description <|
+        \_ -> isValid email |> Expect.equal False
 
 
 validEmailTests : List Test
 validEmailTests =
-    List.map (toIsValidTest True) validEmails
+    List.map toValidTest validEmails
 
 
 invalidEmailTests : List Test
 invalidEmailTests =
-    List.map (toIsValidTest False) invalidEmails
+    List.map toInvalidTest invalidEmails
