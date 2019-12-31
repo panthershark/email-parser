@@ -64,6 +64,9 @@ validEmails =
     , { description = "multiple dots in domain part"
       , email = "firstname@example.co.uk"
       }
+    , { description = "ipv4 address for domain"
+      , email = "email@123.123.123.123"
+      }
     ]
 
 
