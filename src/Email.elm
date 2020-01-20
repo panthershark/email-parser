@@ -86,28 +86,23 @@ localParser =
         |> andThen checkLocal
 
 
-domainPart : Parser String
-domainPart =
+domainParser : Parser String
+domainParser =
     let
         checkLen s =
             if String.isEmpty s then
+                problem "domain is empty"
+
+            else if not <| String.contains "." s then
                 problem "domain is not valid"
 
             else
                 succeed s
     in
     chompWhile
-        (\c -> Char.isAlphaNum c || c == '-')
+        (\c -> Char.isAlphaNum c || c == '-' || c == '.')
         |> getChompedString
         |> andThen checkLen
-
-
-domainParser : Parser String
-domainParser =
-    succeed (\pre suf -> pre ++ "." ++ suf)
-        |= domainPart
-        |. symbol "."
-        |= domainPart
 
 
 emailParser : Parser EmailAddress
