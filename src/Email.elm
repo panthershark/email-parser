@@ -6,7 +6,7 @@ module Email exposing (EmailAddress, isValid, parse, toString)
 
 -}
 
-import Parser exposing ((|.), (|=), DeadEnd, Parser, andThen, chompUntil, chompWhile, end, getChompedString, problem, run, succeed, symbol)
+import Parser exposing ((|.), (|=), DeadEnd, Parser, andThen, chompIf, chompUntil, chompWhile, end, getChompedString, problem, run, succeed, symbol)
 
 
 {-| A model for representing an email. This is exposed, but you'll probably only use it is using parseEmailAddress
@@ -68,26 +68,36 @@ checkLocal str =
                 || (c == '`')
                 || (c == '{')
                 || (c == '}')
+                || (c == '.')
     in
     if String.isEmpty str then
-        problem "local part of email is empty"
+        problem "local part is empty"
+
+    else if String.startsWith "." str then
+        problem "local part cannot start with ."
+
+    else if String.endsWith "." str then
+        problem "local part cannot end with ."
+
+    else if String.contains ".." str then
+        problem "local part cannot contain .."
 
     else if String.foldl (\c acc -> acc && isLocalChar c) True str then
         succeed str
 
     else
-        problem "local part is not valid"
+        problem "local part contains invalid characters"
 
 
-localParser : Parser String
-localParser =
+localPart : Parser String
+localPart =
     chompUntil "@"
         |> getChompedString
         |> andThen checkLocal
 
 
-domainParser : Parser String
-domainParser =
+domainPart : Parser String
+domainPart =
     let
         checkLen s =
             if String.isEmpty s then
@@ -108,7 +118,7 @@ domainParser =
 emailParser : Parser EmailAddress
 emailParser =
     succeed EmailAddress
-        |= localParser
+        |= localPart
         |. symbol "@"
-        |= domainParser
+        |= domainPart
         |. end

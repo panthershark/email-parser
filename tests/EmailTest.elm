@@ -23,6 +23,14 @@ suite =
                 \_ ->
                     isValid "hello@world.com"
                         |> Expect.equal True
+            , test "valid email - dot in local part" <|
+                \_ ->
+                    isValid "hello.world@world.com"
+                        |> Expect.equal True
+            , test "valid email - multiple dots in local part" <|
+                \_ ->
+                    isValid "h.e.l.l.o@world.com"
+                        |> Expect.equal True
             , test "valid email, multiple dots in domain parts" <|
                 \_ ->
                     isValid "user@one.two.three"
@@ -46,6 +54,24 @@ suite =
             , test "missing local" <|
                 \_ ->
                     isValid "@world.com"
+                        |> Expect.equal False
+            ]
+        , describe "obscure email variations (these are valid if quoted, but RFC 5321 warns against it and this is accepted as a bad idea)"
+            [ test "local part is whitespace - not quoted" <|
+                \_ ->
+                    isValid " @example.org"
+                        |> Expect.equal False
+            , test "local part has 2 consecutive dots" <|
+                \_ ->
+                    isValid "john..doe@example.org"
+                        |> Expect.equal False
+            , test "local part starts with dot" <|
+                \_ ->
+                    isValid ".john@example.org"
+                        |> Expect.equal False
+            , test "local part ends with dot" <|
+                \_ ->
+                    isValid "john.@example.org"
                         |> Expect.equal False
             ]
         , describe "toString"
