@@ -3,7 +3,7 @@
     "name": "panthershark/email-parser",
     "summary": "Safely parse and validate email addresses",
     "license": "BSD-3-Clause",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "exposed-modules": [
         "Email"
     ],
