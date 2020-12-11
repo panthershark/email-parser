@@ -106,6 +106,9 @@ domainPart =
             else if not <| String.contains "." s then
                 problem "domain is not valid"
 
+            else if String.endsWith "." s then
+                problem "domain cannot end with ."
+
             else
                 succeed s
     in
