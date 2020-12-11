@@ -118,6 +118,9 @@ invalidEmails =
     , { description = "unquoted trailing spaces"
       , email = "email@domain.com my-name"
       }
+    , { description = "domain part ends with a dot"
+      , email = "email@domain."
+      }
     ]
 
 
